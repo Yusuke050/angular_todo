@@ -1,17 +1,13 @@
+<app-header></app-header>  <!-- ヘッダーを追加 -->
+
 <div class="todo-container">
   <h1>Todo List</h1>
-
-  <div class="input-group">
-    <input [(ngModel)]="newTodo" placeholder="Add a new todo" />
-    <button (click)="addTodo()">Add</button>
-  </div>
-
-  <ul>
-    <li *ngFor="let todo of todos; let i = index">
-      <span>{{ todo.title }}</span>
-      <span [ngClass]="{ 'completed': todo.completed }">{{ todo.completed ? 'Completed' : 'Pending' }}</span>
-      <button (click)="updateTodo(todo)">Toggle Complete</button>
-      <button (click)="removeTodo(todo.id)">Remove</button>
-    </li>
-  </ul>
+  <app-todo-form (add)="addTodo($event)"></app-todo-form>
+  <app-todo-list 
+    [todos]="todos"
+    (deleteTodo)="removeTodo($event)"
+    (updateTodo)="updateTodo($event)">
+  </app-todo-list>
 </div>
+
+<app-footer></app-footer>  <!-- フッターを追加 -->

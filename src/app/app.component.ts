@@ -1,53 +1,42 @@
+// src/app/app.component.ts
 import { Component, OnInit } from '@angular/core';
-import { TodoService } from './app.service';
-import { todo } from './todo.models';
+import { TodoService } from '../app/todo.service';
+import { Todo } from './shared/models/todo.model';
 
 @Component({
-  selector: 'app-todo',
+  selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class TodoComponent implements OnInit {
-  todos: todo[] = [];  // 型情報を追加
-  newTodo: string = '';
+export class AppComponent implements OnInit {
+  todos: Todo[] = [];
 
   constructor(private todoService: TodoService) {}
 
-  // 新しいTodoを追加する
-  addTodo() {
-    if (this.newTodo.trim()) {
-      const newTodoItem: todo = {
-        title: this.newTodo,
-        completed: false,
-        userId: 1,
-        id: this.todos.length + 1,  // 仮のIDを設定
-      };
-      this.todoService.addTodo(newTodoItem).subscribe((data: todo) => {
-        this.todos.push(data);  // サーバーから返ってきたデータを追加
-      });
-      this.newTodo = '';
-    }
+  ngOnInit() {
+    this.todoService.getTodos().subscribe((data: Todo[]) => {
+      this.todos = data.slice(0, 10);
+    });
   }
 
-  // Todoを削除する
+  addTodo(newTodoTitle: string) {
+    const newTodo: Todo = {
+      id: this.todos.length + 1,
+      title: newTodoTitle,
+      completed: false
+    };
+    this.todoService.addTodo(newTodo).subscribe((todo: Todo) => {
+      this.todos.push(todo);
+    });
+  }
+
   removeTodo(id: number) {
     this.todoService.deleteTodo(id).subscribe(() => {
       this.todos = this.todos.filter(todo => todo.id !== id);
     });
   }
 
-  // Todoを更新する
-  updateTodo(todo: todo) {
-    todo.completed = !todo.completed;
-    this.todoService.updateTodo(todo).subscribe((updatedTodo: todo) => {
-      // 更新後に必要な処理を記述（例：通知やメッセージ）
-    });
-  }
-
-  // コンポーネント初期化時にTodoを取得
-  ngOnInit() {
-    this.todoService.getTodos().subscribe((data: todo[]) => {
-      this.todos = data.slice(0, 10);  // 表示件数を10件に制限
-    });
+  updateTodo(updatedTodo: Todo) {
+    this.todoService.updateTodo(updatedTodo).subscribe();
   }
 }
